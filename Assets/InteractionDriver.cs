@@ -31,6 +31,9 @@ public class InteractionDriver : MonoBehaviour
                 if (interaction)
                 {
                     onUpdateInteraction.AddListener(interaction.Invoke);
+                    interaction.sPoint = Input.mousePosition;
+                    interaction.stateUpdate(true); 
+                    //onUpdateInteraction.Invoke(Input.mousePosition); 
                 }
                 //Debug.Log(hit.transform.name);
                 Debug.Log("hit");
@@ -40,10 +43,12 @@ public class InteractionDriver : MonoBehaviour
             //exited a mouse event
             inInteraction = false;
             //calculate momentum
+            
             onUpdateInteraction.RemoveAllListeners();
+            Debug.Log("removed all listeners");
         }
         else if (Input.GetMouseButton(0)){
-            onUpdateInteraction.Invoke(new Vector2(0f, 0f));
+            onUpdateInteraction.Invoke(Input.mousePosition);
         }
     }
 
