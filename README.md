@@ -4,12 +4,15 @@
 This project produces a gimbal tool with support for 9 DOF - Rotation (Orientation), Translation (Position), and Scale (Size).
 
 
+
+
 ## Demo
 
-#### PC Build (this)
+#### PC Build (main)
+![](https://github.com/adellari/Gimbal-PC/blob/main/PC.gif)
 
-#### iOS Build
-
+#### iOS Build (AR Branch)
+![](https://github.com/adellari/Gimbal-PC/blob/main/AR.gif)
 
 ## How it works
 This sytem is composed of 3 controlling scripts: InteractionDriver.cs, InteractionAxis.cs, and InteractionObject.cs. Interaction Axis is attached to gimbal tools (ring for rotation, cone for translation, ball for scaling), InteractionDriver is attached to a camera object, and InteractionObject is attached to a GameObject which needs to be manipulated.
@@ -33,5 +36,5 @@ Class residing on the object being controlled, with references to the gimbal too
 
 - Better directional rotation (sometimes rotation is reversed)
 
-- Publish AR project
+- Publish AR branch
 
