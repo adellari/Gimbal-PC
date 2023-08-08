@@ -52,9 +52,9 @@ public class InteractionObject : MonoBehaviour
         obj.rotation = Quaternion.LookRotation(xRingForward, xRingUp);
 
         //move the cone tool to the appropriate direction and distance
-        obj.GetChild(0).position = obj.position + obj.up * 1.265f;
+        obj.GetChild(0).position = obj.position + obj.up * 1.065f;
         //move the ball tool to the appropriate direction and distance
-        obj.GetChild(1).position = obj.position + obj.up * 1.065f;
+        obj.GetChild(1).position = obj.position + obj.up * 1.265f;
 
         // For the Y Ring (Yaw) its forward is always interactObject's forward direction
         Vector3 yRingForward = transform.forward;
@@ -65,9 +65,9 @@ public class InteractionObject : MonoBehaviour
         obj.rotation = Quaternion.LookRotation(yRingForward, yRingUp);
 
         //move the cone tool to the appropriate direction and distance
-        obj.GetChild(0).position = obj.position + obj.up * 1.265f;
+        obj.GetChild(0).position = obj.position + obj.up * 1.065f;
         //move the ball tool to the appropriate direction and distance
-        obj.GetChild(1).position = obj.position + obj.up * 1.065f;
+        obj.GetChild(1).position = obj.position + obj.up * 1.265f;
 
         // For the Z Ring (Roll) its forward is always interactObject's down direction
         Vector3 zRingForward = -transform.up;
@@ -79,9 +79,9 @@ public class InteractionObject : MonoBehaviour
 
 
         //move the cone tool to the appropriate direction and distance
-        obj.GetChild(0).position = obj.position + obj.up * 1.265f;
+        obj.GetChild(0).position = obj.position + obj.up * 1.065f;
         //move the ball tool to the appropriate direction and distance
-        obj.GetChild(1).position = obj.position + obj.up * 1.065f;
+        obj.GetChild(1).position = obj.position + obj.up * 1.265f;
     }
 
     // Update is called once per frame
