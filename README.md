@@ -11,7 +11,7 @@ This project produces a gimbal tool with support for 9 DOF - Rotation (Orientati
 #### PC Build (main)
 ![](https://github.com/adellari/Gimbal-PC/blob/main/PC.gif)
 
-#### iOS Build (AR Branch)
+#### iOS Build (iOS Branch)
 ![](https://github.com/adellari/Gimbal-PC/blob/main/AR.gif)
 
 ## How it works
