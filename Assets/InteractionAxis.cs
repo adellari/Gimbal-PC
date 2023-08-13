@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 
@@ -32,8 +34,12 @@ public class InteractionAxis : MonoBehaviour
     public Transform interactObject;
 
     public float momentumThreshold = 10000f;
-    //current interaction momentum
-    private float momentum;
+    //current interaction momentum 
+    public Queue<float> momentum = new Queue<float>();
+    //keep track of the direction of our momentum
+    Vector3 mDir;
+    //last Time we invoked function;
+    private float lInvoke = 0f;
     //the starting interaction point
     public Vector2 sPoint;
     //the starting angle
@@ -42,6 +48,11 @@ public class InteractionAxis : MonoBehaviour
     public float sDistance;
     //record our initial scale;
     public Vector3 sScale;
+
+    //fall-off function for momentum drive
+    public AnimationCurve mCurve;
+    //store animation curve in a float array so we only have to evaluate once
+    //public float[] mVals;
 
     public Quaternion sOrientation;
     //the current interaction point
@@ -65,6 +76,29 @@ public class InteractionAxis : MonoBehaviour
         relToObj = transform.position - interactObject.position;
         relativeDistance = Vector3.Distance(transform.position, interactObject.position);
     }
+
+    IEnumerator applyMomentum()
+    {
+        //yield return null;
+        var avg = momentum.Sum() / 5f;
+        if (avg > 12f)
+        {
+            Debug.Log("applying momentum");
+            float start = avg;
+            float sTime = Time.realtimeSinceStartup;
+
+            while (Time.realtimeSinceStartup - sTime < 1f) //20% degredation is good enough to exit
+            {
+                float cTime = (Time.realtimeSinceStartup - sTime) / 1f; //go on for 1 seconds
+                avg = Mathf.Exp(2 * (1f - cTime) - 2f);
+                interactObject.position += mDir * (start * avg * 0.001f);
+                Debug.Log("reporting on the factor: " + avg);
+                yield return null;
+            }
+
+        }
+    }
+
     #region Gimbal Functions
     #region Defunct
         //axis dot view direction >= 0.5 means it's practically flat and we can do vertical
@@ -186,6 +220,7 @@ public class InteractionAxis : MonoBehaviour
     {
         Ray mouseRay = Camera.main.ScreenPointToRay(cPoint);
         Vector3 lineDir = (transform.position - interactObject.position).normalized; //or just transform.up since the tip always aligns w line
+        Vector3 _sPos = interactObject.position.normalized;
 
         Vector3 w0 = interactObject.position - mouseRay.origin;
         Vector3 a = lineDir; // Line direction
@@ -209,9 +244,21 @@ public class InteractionAxis : MonoBehaviour
             //length from interactObject the intersection occurs
             float s = (aDotB * bDotW0 - bDotB * aDotW0) / denom; 
             //Add interactObject's position to the direction
-            Vector3 projection = interactObject.position + lineDir * s; 
+            Vector3 projection = interactObject.position + lineDir * s;
+            var _ = interactObject.position;
+            
             //Substract relative offset to keep obj at const distance from tool
-            interactObject.position = projection - (lineDir * relativeDistance); 
+            interactObject.position = projection - (lineDir * relativeDistance);
+
+            var m = Vector3.Distance(interactObject.position, _) / (Time.realtimeSinceStartup - lInvoke);
+            if (momentum.Count > 5) momentum.Dequeue();
+            momentum.Enqueue(m);
+
+            var x = Vector3.Dot((interactObject.position - _).normalized, lineDir);
+
+            if(x > 0) //let's not count the frames where the mouse is stagnant
+                mDir = lineDir * x;
+            Debug.Log("logging momentum: " + mDir);
         }
     }
 
@@ -321,6 +368,8 @@ public class InteractionAxis : MonoBehaviour
             break;
 
         }
+        lInvoke = Time.realtimeSinceStartup;
+        //StartCoroutine(checkInteractionEnd(lInvoke));
     }
 
     //Captures state variables for reference in manipulating our interactObject.
@@ -339,7 +388,12 @@ public class InteractionAxis : MonoBehaviour
             sScale = interactObject.localScale;
             sDistance = Vector3.Distance(Camera.main.ScreenToWorldPoint(cPoint), interactObject.position);
             //Debug.Log("stored pose: " + Time.realtimeSinceStartup);
-        } 
+            momentum = new Queue<float>();
+        }
+        else
+        {
+            StartCoroutine(applyMomentum());
+        }
         /*
         else if(!state && momentum < momentumThreshold)
          isInteract = false;
