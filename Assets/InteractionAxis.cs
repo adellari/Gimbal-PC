@@ -81,7 +81,9 @@ public class InteractionAxis : MonoBehaviour
     {
         //yield return null;
         var avg = momentum.Sum() / 5f;
-        if (avg > 12f)
+        var _thresh = _type == interactType.translate ? 12f : 10f;
+        Debug.Log("momentum average: " + avg);
+        if (avg > _thresh && _type != interactType.scale)
         {
             Debug.Log("applying momentum");
             float start = avg;
@@ -90,9 +92,17 @@ public class InteractionAxis : MonoBehaviour
             while (Time.realtimeSinceStartup - sTime < 1f) //20% degredation is good enough to exit
             {
                 float cTime = (Time.realtimeSinceStartup - sTime) / 1f; //go on for 1 seconds
-                avg = Mathf.Exp(2 * (1f - cTime) - 2f);
-                interactObject.position += mDir * (start * avg * 0.001f);
-                Debug.Log("reporting on the factor: " + avg);
+                avg = Mathf.Exp(7 * (1f - cTime) - 7f);
+                if (_type == interactType.translate)
+                interactObject.position += mDir * (start * avg * 0.01f);
+                else
+                {
+                    var _rot = interactObject.rotation;
+                    _rot = Quaternion.AngleAxis(start * avg, mDir * 0.01f) * _rot;
+                    interactObject.rotation = _rot;
+                }
+                
+                //Debug.Log("reporting on the factor: " + avg);
                 yield return null;
             }
 
@@ -269,6 +279,8 @@ public class InteractionAxis : MonoBehaviour
     //matmul relative rotation with initial 'sOrientation' to get new oreintation and avoid gimbal lock
     void Rotate() 
     {
+        var _ = interactObject.rotation;
+
         Vector2 mouseDelta = cPoint - sPoint;
 
         // This is our constant rotation axis
@@ -288,9 +300,25 @@ public class InteractionAxis : MonoBehaviour
 
         // Compute the delta rotation
         Quaternion rotationDelta = Quaternion.AngleAxis(rotationAmount, rotationAxis);
-
+             
         // Apply the rotation to the initial orientation
         interactObject.rotation = rotationDelta * sOrientation;
+        
+        var _delta = (interactObject.rotation * Quaternion.Inverse(_));
+        float _angle;
+        Vector3 _axis;
+        _delta.ToAngleAxis(out _angle, out _axis); //the cool thing is that angleAxis returns an inverted axis for negative angles
+        //var val = _delta.magnitude % 180f;
+        //when above 180, we must get the right value by val - 360;
+
+        if (_angle > 0f){
+            if (momentum.Count > 5) momentum.Dequeue();
+            momentum.Enqueue(_angle);
+            mDir = _axis;
+        }
+        
+        
+        Debug.Log(_angle * Vector3.Dot(_axis, rotationAxis)); 
     }
 
     
@@ -388,6 +416,8 @@ public class InteractionAxis : MonoBehaviour
             sScale = interactObject.localScale;
             sDistance = Vector3.Distance(Camera.main.ScreenToWorldPoint(cPoint), interactObject.position);
             //Debug.Log("stored pose: " + Time.realtimeSinceStartup);
+            //need to get all InteractionAxis instances so momentum stops in all directions
+            StopCoroutine(applyMomentum()); 
             momentum = new Queue<float>();
         }
         else

@@ -8,6 +8,9 @@ This project produces a gimbal tool with support for 9 DOF - Rotation (Orientati
 
 ## Demo
 
+#### Translational + Rotational Momentum (new)
+![](https://github.com/adellari/Gimbal-PC/blob/main/Momentum.gif)
+
 #### PC Build (main)
 ![](https://github.com/adellari/Gimbal-PC/blob/main/PC.gif)
 
@@ -32,7 +35,7 @@ Class residing on the object being controlled, with references to the gimbal too
 
 - Fix eratic and undesired rotation (glitch)
 
-- Add momentum-based translation and rotation
+- ~~Add momentum-based translation and rotation~~
 
 - Better directional rotation (sometimes rotation is reversed)
 
