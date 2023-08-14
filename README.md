@@ -33,9 +33,13 @@ Class residing on the object being controlled, with references to the gimbal too
 
 ## Roadmap
 
+- ~~Add momentum-based translation and rotation~~
+
 - Fix eratic and undesired rotation (glitch)
 
-- ~~Add momentum-based translation and rotation~~
+- Add interaction enter/exit cues
+
+- Fix disk mesh collider accuracy
 
 - Better directional rotation (sometimes rotation is reversed)
 
