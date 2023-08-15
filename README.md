@@ -35,9 +35,9 @@ Class residing on the object being controlled, with references to the gimbal too
 
 - ~~Add momentum-based translation and rotation~~
 
-- Fix eratic and undesired rotation (glitch)
+- ~~Add interaction enter/exit cues~~
 
-- Add interaction enter/exit cues
+- Fix eratic and undesired rotation (glitch)
 
 - Fix disk mesh collider accuracy
 

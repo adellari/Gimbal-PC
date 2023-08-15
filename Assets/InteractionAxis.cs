@@ -22,6 +22,29 @@ public enum interactScope {
         world
     };
 
+
+public static class GimbalColors{
+    public static Color ActivatedColor = new Color(1f, 0.7f, 0f, 0.1f);
+    public static Color BaseColor(axis _){
+        Color r = Color.white;
+        switch (_)
+        {
+            case axis.x:
+            r = new Color(1f, 0f, 0.04f, 0.1f);
+            break;
+
+            case axis.y:
+            r = new Color(0f, 1f, 0.01f, 0.1f);
+            break;
+
+            case axis.z:
+            r = new Color(0f, 0.8f, 1f, 0.1f);
+            break;
+        }
+        return r;
+    }
+}
+
 //InteractionAxis - Class residing on the each of the gimbal tools that compose a gimbal. Each object containing this class should be classified
 //in its function (interactType), axis of influence (axis), and object to influence (interactObject)
 //The function of this class is to provide gimbal tool functionality to a given object, and manipulate an InteractionObject based on inputs from 
@@ -68,7 +91,24 @@ public class InteractionAxis : MonoBehaviour
     private float relativeDistance;
     //test dummy
     public Transform dummy;
+    //keep track of whether we're in an interaction
+    private bool _inInteraction = false;
 
+    private bool inInteraction
+    {
+        get { return _inInteraction; }
+        set
+        {
+            if(_inInteraction != value)
+            {
+                _inInteraction = value;
+                var mat = GetComponent<MeshRenderer>().material;
+                var col = value? GimbalColors.ActivatedColor : GimbalColors.BaseColor(_axis);
+                mat.SetColor("_Color", col);
+                //Debug.Log("color swapped");
+            }
+        }
+    }
     // Start is called before the first frame update
     void Start()
     {
@@ -396,6 +436,9 @@ public class InteractionAxis : MonoBehaviour
             break;
 
         }
+        if (!inInteraction)
+        inInteraction = true;
+
         lInvoke = Time.realtimeSinceStartup;
         //StartCoroutine(checkInteractionEnd(lInvoke));
     }
@@ -422,6 +465,7 @@ public class InteractionAxis : MonoBehaviour
         }
         else
         {
+            inInteraction = false;
             StartCoroutine(applyMomentum());
         }
         /*
